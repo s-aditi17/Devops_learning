@@ -56,6 +56,25 @@ pipeline {
             }
         }
 
+stage('Deploy to S3') {
+    steps {
+        sh '''
+            export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
+
+            # Install AWS CLI if not already installed
+            if ! command -v aws &> /dev/null
+            then
+                echo "Installing AWS CLI..."
+                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                unzip awscliv2.zip
+                sudo ./aws/install
+            fi
+
+            # Deploy to S3
+            aws s3 sync dist/ s3://jenkins-angular-bucket/
+        '''
     }
+}    
+}
 }
 
