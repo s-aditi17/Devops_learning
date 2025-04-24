@@ -6,9 +6,6 @@ node {
     stage('Install Node.js') {
         echo "Installing Node.js ${nodeVersion}..."
         sh '''
-            # Remove any previous Node.js versions
-            sudo rm -rf /usr/local/bin/node /usr/local/bin/npm /usr/local/lib/node_modules
-
             # Download and install specific Node.js version
             curl -O https://nodejs.org/dist/v14.19.0/node-v14.19.0-linux-x64.tar.xz
             tar -xf node-v14.19.0-linux-x64.tar.xz
