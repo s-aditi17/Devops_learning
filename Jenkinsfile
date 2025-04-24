@@ -56,33 +56,34 @@ pipeline {
             }
         }
 
-stage('Deploy to S3') {
-    steps {
-        sh '''
-            export PATH=$PWD/${NODE_DIR}/bin:$PATH
+        stage('Deploy to S3') {
+            steps {
+                sh '''
+                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
 
-            echo "🚀 Deploying to S3..."
+                    echo "Deploying to S3..."
 
-            # Install unzip if not present
-            if ! command -v unzip &> /dev/null; then
-                echo "Installing unzip..."
-                sudo apt-get update && sudo apt-get install -y unzip
-            fi
+                    # Ensure unzip is available before it's used
+                    if ! command -v unzip &> /dev/null; then
+                        echo "Installing unzip..."
+                        apt-get update && apt-get install -y unzip
+                    fi
 
-            # Install AWS CLI if not present
-            if ! command -v aws &> /dev/null; then
-                echo "Installing AWS CLI..."
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip awscliv2.zip
-                sudo ./aws/install
-            fi
+                    # Install AWS CLI if not already installed
+                    if ! command -v aws &> /dev/null; then
+                        echo "Installing AWS CLI..."
+                        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+                        unzip awscliv2.zip
+                        ./aws/install -i $PWD/aws-cli -b $PWD/aws-cli-bin
+                        export PATH=$PWD/aws-cli-bin:$PATH
+                    fi
 
-            # Sync built files to S3 bucket
-            aws s3 sync dist/ s3://jenkins-angular-bucket/
-        '''
+                    # Sync build output to S3
+                    aws s3 sync dist/ s3://jenkins-angular-bucket/
+                '''
+            }
+        }
     }
-}
-  
-}
+
 }
 
