@@ -1,30 +1,19 @@
 pipeline {
     agent any
 
+    tools {
+        nodejs 'NodeJS 14.19.0'  
+    }
+
     environment {
-        NODE_VERSION = 'v14.19.0'
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
     }
 
     stages {
-        stage('Download Node.js') {
-            steps {
-                sh '''
-                    echo "Downloading Node.js ${NODE_VERSION}..."
-                    curl -O https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz
-                    tar -xf node-${NODE_VERSION}-linux-x64.tar.xz
-                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
-                    node -v
-                    npm -v
-                '''
-            }
-        }
-
         stage('Install npm and Angular CLI') {
             steps {
                 sh '''
-                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
                     npm install -g npm@${NPM_VERSION}
                     npm install -g @angular/cli@${ANGULAR_CLI_VERSION}
                     ng version
@@ -40,34 +29,23 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh '''
-                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
-                    npm install
-                '''
+                sh 'npm install'
             }
         }
 
         stage('Build Angular App') {
             steps {
-                sh '''
-                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
-                    ng build --configuration production
-                '''
+                sh 'ng build --configuration production'
             }
         }
 
         stage('Deploy to S3') {
             steps {
                 sh '''
-                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
-
                     echo "Deploying to S3..."
-
-                    # Sync built files to S3 bucket
                     aws s3 sync dist/ s3://jenkins-angular-bucket/
                 '''
             }
         }
-    }  
+    }
 }
-
