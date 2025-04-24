@@ -56,6 +56,21 @@ pipeline {
             }
         }
 
+        stage('Install unzip') {
+            steps {
+                sh 'apt-get update && apt-get install -y unzip'
+            }
+        }
+
+        stage('Install AWS CLI') {
+            steps {
+              
+                sh 'sudo apt-get install -y awscli'
+             
+                sh 'aws --version'
+            }
+        }
+
         stage('Deploy to S3') {
             steps {
                 sh '''
@@ -63,27 +78,11 @@ pipeline {
 
                     echo "Deploying to S3..."
 
-                    # Ensure unzip is available before it's used
-                    if ! command -v unzip &> /dev/null; then
-                        echo "Installing unzip..."
-                        apt-get update && apt-get install -y unzip
-                    fi
-
-                    # Install AWS CLI if not already installed
-                    if ! command -v aws &> /dev/null; then
-                        echo "Installing AWS CLI..."
-                        curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                        unzip awscliv2.zip
-                        ./aws/install -i $PWD/aws-cli -b $PWD/aws-cli-bin
-                        export PATH=$PWD/aws-cli-bin:$PATH
-                    fi
-
-                    # Sync build output to S3
+                    # Sync built files to S3 bucket
                     aws s3 sync dist/ s3://jenkins-angular-bucket/
                 '''
             }
         }
-    }
-
+    }  
 }
 
