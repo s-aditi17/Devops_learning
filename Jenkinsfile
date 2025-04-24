@@ -56,21 +56,6 @@ pipeline {
             }
         }
 
-        stage('Install unzip') {
-            steps {
-                sh 'apt-get update && apt-get install -y unzip'
-            }
-        }
-
-        stage('Install AWS CLI') {
-            steps {
-              
-                sh 'sudo apt-get install -y awscli'
-             
-                sh 'aws --version'
-            }
-        }
-
         stage('Deploy to S3') {
             steps {
                 sh '''
