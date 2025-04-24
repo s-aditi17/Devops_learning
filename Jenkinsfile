@@ -9,7 +9,7 @@ node {
             # Download and install specific Node.js version
             curl -O https://nodejs.org/dist/v14.19.0/node-v14.19.0-linux-x64.tar.xz
             tar -xf node-v14.19.0-linux-x64.tar.xz
-            sudo cp -r node-v14.19.0-linux-x64/* /usr/local/
+            cp -r node-v14.19.0-linux-x64/* /usr/local/
 
             # Verify versions
             node -v
