@@ -43,7 +43,7 @@ pipeline {
             steps {
                 sh '''
                     echo "Deploying to S3..."
-                    aws s3 sync dist/ s3://jenkins-angular-bucket/
+                    aws s3 sync dist/my-jenkins-app s3://jenkins-angular-bucket/
                 '''
             }
         }
