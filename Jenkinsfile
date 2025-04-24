@@ -56,17 +56,6 @@ pipeline {
             }
         }
 
-        stage('Archive Artifacts') {
-            steps {
-                archiveArtifacts artifacts: 'dist/**/*', allowEmptyArchive: true
-            }
-        }
-    }
-
-    post {
-        always {
-            cleanWs()
-        }
     }
 }
 
