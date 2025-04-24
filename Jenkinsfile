@@ -1,51 +1,72 @@
-node {
-    def nodeVersion = 'v14.19.0'
-    def npmVersion = '8.5.2'
-    def angularCliVersion = '12.2.16'
+pipeline {
+    agent any
 
-    stage('Install Node.js') {
-        echo "Installing Node.js ${nodeVersion}..."
-        sh '''
-            # Download and install specific Node.js version
-            curl -O https://nodejs.org/dist/v14.19.0/node-v14.19.0-linux-x64.tar.xz
-            tar -xf node-v14.19.0-linux-x64.tar.xz
-            export PATH=$PWD/node-v14.19.0-linux-x64/bin:$PATH
-
-            # Verify versions
-            node -v
-            npm -v
-        '''
+    environment {
+        NODE_VERSION = 'v14.19.0'
+        NPM_VERSION = '8.5.2'
+        ANGULAR_CLI_VERSION = '12.2.16'
     }
 
-    stage('Install npm version') {
-        echo "Installing npm ${npmVersion}..."
-        sh "npm install -g npm@${npmVersion}"
-        sh "npm -v"
+    stages {
+        stage('Download Node.js') {
+            steps {
+                sh '''
+                    echo "Downloading Node.js ${NODE_VERSION}..."
+                    curl -O https://nodejs.org/dist/${NODE_VERSION}/node-${NODE_VERSION}-linux-x64.tar.xz
+                    tar -xf node-${NODE_VERSION}-linux-x64.tar.xz
+                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
+                    node -v
+                    npm -v
+                '''
+            }
+        }
+
+        stage('Install npm and Angular CLI') {
+            steps {
+                sh '''
+                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
+                    npm install -g npm@${NPM_VERSION}
+                    npm install -g @angular/cli@${ANGULAR_CLI_VERSION}
+                    ng version
+                '''
+            }
+        }
+
+        stage('Clone Repo') {
+            steps {
+                git 'https://github.com/s-aditi17/Devops_learning.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh '''
+                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
+                    npm install
+                '''
+            }
+        }
+
+        stage('Build Angular App') {
+            steps {
+                sh '''
+                    export PATH=$PWD/node-${NODE_VERSION}-linux-x64/bin:$PATH
+                    ng build --configuration production
+                '''
+            }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                archiveArtifacts artifacts: 'dist/**/*', allowEmptyArchive: true
+            }
+        }
     }
 
-    stage('Install Angular CLI') {
-        echo "Installing Angular CLI ${angularCliVersion}..."
-        sh "npm install -g @angular/cli@${angularCliVersion}"
-        sh "ng version"
-    }
-
-    stage('Clone Repository') {
-        git credentialsId: 'github-credentials', url: 'https://github.com/s-aditi17/Devops_learning.git'
-    }
-
-    stage('Install Dependencies') {
-        sh 'npm install'
-    }
-
-    stage('Build Angular App') {
-        sh 'ng build --configuration production'
-    }
-
-    stage('Archive Artifacts') {
-        archiveArtifacts artifacts: 'dist/**/*', allowEmptyArchive: true
-    }
-
-    stage('Clean Workspace') {
-        cleanWs()
+    post {
+        always {
+            cleanWs()
+        }
     }
 }
+
