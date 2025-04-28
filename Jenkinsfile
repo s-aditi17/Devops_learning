@@ -20,20 +20,20 @@ pipeline {
         }
         
         stage('SonarQube Analysis') {
-            steps {
-                script {
-                    // Run SonarQube analysis using sonar
-                    withSonarQubeEnv(SONARQUBE_SERVER) {
-                        sh '''
-                            ${scannerHome}/bin/sonar \
-                            -Dsonar.projectKey=Devops_learning \
-                            -Dsonar.sources=src \
-                            -Dsonar.login=${SONARQUBE_TOKEN}
-                        '''
-                    }
-                }
+    steps {
+        script {
+            // Run SonarQube analysis using sonar-scanner
+            withSonarQubeEnv('sonar') {
+                sh '''
+                    sonar-scanner \
+                    -Dsonar.projectKey=Devops_learning \
+                    -Dsonar.sources=src \
+                    -Dsonar.login=${SONARQUBE_TOKEN}
+                '''
             }
         }
+    }
+}
         
         stage('Install npm and Angular CLI') {
             steps {
