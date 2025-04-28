@@ -34,24 +34,24 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {    
-            environment {
-                SONAR_SCANNER_HOME = tool 'sonar'
-            }
-            steps {
-                withSonarQubeEnv('sonar') { 
-                    sh '''
-                        ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                        -Dsonar.projectKey=my-angular-project \
-                        -Dsonar.projectName="My Angular App" \
-                        -Dsonar.sources=src \
-                        -Dsonar.exclusions=**/*.spec.ts \
-                        -Dsonar.language=ts \
-                        -Dsonar.typescript.tsconfigPath=tsconfig.json \
-                        -Dsonar.nodejs.executable=/usr/bin/node
-                    '''
-                }
-            }
+    environment {
+        SONAR_SCANNER_HOME = tool 'sonar'
+    }
+    steps {
+        withSonarQubeEnv('sonar') { 
+            sh '''
+                ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
+                -Dsonar.projectKey=my-angular-project \
+                -Dsonar.projectName="My Angular App" \
+                -Dsonar.sources=src \
+                -Dsonar.exclusions=**/*.spec.ts,**/node_modules/** \
+                -Dsonar.language=ts \
+                -Dsonar.typescript.tsconfigPath=tsconfig.json \
+                -Dsonar.nodejs.executable=/usr/bin/node
+            '''
         }
+    }
+}
 
         stage('Build Angular App') {
             steps {
