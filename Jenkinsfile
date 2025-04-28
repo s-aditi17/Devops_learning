@@ -33,40 +33,39 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {    
-    environment {
-        SONAR_SCANNER_HOME = tool 'sonar'
-    }
+        stage ('Sonarqube scan'){
+           steps{
+            script {
+              scannerHome = tool 'sonar'
+                }
+                withSonarQubeEnv('sonar') {
+              sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=my-angular-app -Dsonar.sources=src"
+                  }
+                }
+              }
+        stage('Download SonarQube Report') {
     steps {
-        withSonarQubeEnv('sonar') { 
-            sh '''
-                ${SONAR_SCANNER_HOME}/bin/sonar-scanner \
-                -Dsonar.projectKey=my-angular-project \
-                -Dsonar.projectName="My Angular App" \
-                -Dsonar.sources=src \
-                -Dsonar.exclusions=**/*.spec.ts,**/node_modules/** \
-                -Dsonar.language=ts \
-                -Dsonar.typescript.tsconfigPath=tsconfig.json \
-                -Dsonar.nodejs.executable=/usr/bin/node
-            '''
+        script {
+            def sonarHost = 'http://18.215.144.54:9000'
+            def projectKey = 'my-angular-app'
+            def authToken = 'squ_94c360b1e0e4bf5e9396a0091dca5d0f2dcd276f'
+ 
+            // Download Issues Report (JSON format)
+            sh """
+                curl -u ${authToken}: \
+                '${sonarHost}/api/issues/search?componentKeys=${projectKey}&resolved=false' \
+                -o sonar-report.json
+            """
+ 
+            // Archive the JSON report (optional)
+            archiveArtifacts artifacts: 'sonar-report.json', fingerprint: true
         }
-    }
-}
+        }
+        }
 
         stage('Build Angular App') {
             steps {
                 sh 'ng build --configuration production'
-            }
-        }
-
-        stage('Deploy to S3') {
-            steps {
-                withEnv(["PATH=/usr/local/bin:$PATH"]) { 
-                    sh '''
-                        echo Deploying to S3...
-                        aws s3 sync dist/kickstart-angular s3://jenkins-angular-bucket/
-                    '''
-                }
             }
         }
     }
