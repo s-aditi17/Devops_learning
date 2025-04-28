@@ -40,12 +40,10 @@ pipeline {
                 script {
                     // Run SonarQube analysis using sonar-scanner 
                     withSonarQubeEnv(SONARQUBE_SERVER) {
-                        sh '''
-                            sonar-scanner \
-                                -Dsonar.projectKey=Devops_learning \
+                        sh " ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Devops_learning -Dsonar.sources=src"
                           
                                
-                        '''
+                   
                     }
                 }
             }
