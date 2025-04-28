@@ -22,10 +22,10 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 script {
-                    // Run SonarQube analysis using sonar-scanner 
+                    // Run SonarQube analysis using sonar
                     withSonarQubeEnv(SONARQUBE_SERVER) {
                         sh '''
-                            ${scannerHome}/bin/sonar-scanner \
+                            ${scannerHome}/bin/sonar \
                             -Dsonar.projectKey=Devops_learning \
                             -Dsonar.sources=src \
                             -Dsonar.login=${SONARQUBE_TOKEN}
