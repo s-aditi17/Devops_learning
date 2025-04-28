@@ -8,12 +8,11 @@ pipeline {
     environment {
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
-        SONARQUBE_SERVER = 'sonar'  
-        SONARQUBE_TOKEN = credentials('sonar')
+        SONARQUBE_SERVER = 'sonar'  // Ensure this matches your configured SonarQube server in Jenkins
+        SONARQUBE_TOKEN = credentials('sonar')  // Credentials ID for your SonarQube token
     }
 
-    
-
+    stages {
         stage('Clone Repo') {
             steps {
                 git 'https://github.com/s-aditi17/Devops_learning.git'
@@ -25,16 +24,17 @@ pipeline {
                 script {
                     // Run SonarQube analysis using sonar-scanner 
                     withSonarQubeEnv(SONARQUBE_SERVER) {
-                        sh " ${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Devops_learning -Dsonar.sources=src"
-                          
-                               
-                   
+                        sh '''
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=Devops_learning \
+                            -Dsonar.sources=src \
+                            -Dsonar.login=${SONARQUBE_TOKEN}
+                        '''
                     }
                 }
             }
         }
         
-        stages {
         stage('Install npm and Angular CLI') {
             steps {
                 sh '''
@@ -51,8 +51,6 @@ pipeline {
             }
         }
 
-        
-        
         stage('Build Angular App') {
             steps {
                 sh 'ng build --configuration production'
