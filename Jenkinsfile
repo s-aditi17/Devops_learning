@@ -22,18 +22,13 @@ pipeline {
         stage('SonarQube Analysis') {
     steps {
         script {
-            // Run SonarQube analysis using sonar-scanner
-            withSonarQubeEnv('sonar') {
-                sh '''
-                    sonar-scanner \
-                    -Dsonar.projectKey=Devops_learning \
-                    -Dsonar.sources=src \
-                    -Dsonar.login=${SONARQUBE_TOKEN}
-                '''
+            withSonarQubeEnv('sonar') { // 'sonar' should match the name you gave in Jenkins configuration
+                sh 'sonar-scanner -Dsonar.projectKey=Devops_learning -Dsonar.sources=src -Dsonar.login=${SONARQUBE_TOKEN}'
             }
         }
     }
 }
+
         
         stage('Install npm and Angular CLI') {
             steps {
