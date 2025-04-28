@@ -8,6 +8,8 @@ pipeline {
     environment {
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
+        SONARQUBE_SERVER = 'sonar'  
+        SONARQUBE_TOKEN = credentials('sonar')
     }
 
     stages {
@@ -33,6 +35,22 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    // Run SonarQube analysis using sonar-scanner 
+                    withSonarQubeEnv(SONARQUBE_SERVER) {
+                        sh '''
+                            sonar-scanner \
+                                -Dsonar.projectKey=Devops_learning \
+                          
+                               
+                        '''
+                    }
+                }
+            }
+        }
+        
         stage('Build Angular App') {
             steps {
                 sh 'ng build --configuration production'
