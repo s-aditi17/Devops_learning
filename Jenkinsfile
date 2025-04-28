@@ -12,29 +12,14 @@ pipeline {
         SONARQUBE_TOKEN = credentials('sonar')
     }
 
-    stages {
-        stage('Install npm and Angular CLI') {
-            steps {
-                sh '''
-                    npm install -g npm@${NPM_VERSION}
-                    npm install -g @angular/cli@${ANGULAR_CLI_VERSION}
-                    ng version
-                '''
-            }
-        }
+    
 
         stage('Clone Repo') {
             steps {
                 git 'https://github.com/s-aditi17/Devops_learning.git'
             }
         }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
+        
         stage('SonarQube Analysis') {
             steps {
                 script {
@@ -48,6 +33,25 @@ pipeline {
                 }
             }
         }
+        
+        stages {
+        stage('Install npm and Angular CLI') {
+            steps {
+                sh '''
+                    npm install -g npm@${NPM_VERSION}
+                    npm install -g @angular/cli@${ANGULAR_CLI_VERSION}
+                    ng version
+                '''
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        
         
         stage('Build Angular App') {
             steps {
