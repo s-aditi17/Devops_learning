@@ -32,7 +32,8 @@ pipeline {
                 sh 'npm install'
             }
         }
-      stage('SonarQube Analysis') {    
+
+        stage('SonarQube Analysis') {    
             environment {
                 SONAR_SCANNER_HOME = tool 'sonar'
             }
@@ -45,7 +46,8 @@ pipeline {
                         -Dsonar.sources=src \
                         -Dsonar.exclusions=**/*.spec.ts \
                         -Dsonar.language=ts \
-                        -Dsonar.typescript.tsconfigPath=tsconfig.json
+                        -Dsonar.typescript.tsconfigPath=tsconfig.json \
+                        -Dsonar.nodejs.executable=/usr/bin/node
                     '''
                 }
             }
@@ -58,14 +60,14 @@ pipeline {
         }
 
         stage('Deploy to S3') {
-    steps {
-        withEnv(["PATH=/usr/local/bin:$PATH"]) { // ADD THIS
-            sh '''
-                echo Deploying to S3...
-                aws s3 sync dist/kickstart-angular s3://jenkins-angular-bucket/
-            '''
+            steps {
+                withEnv(["PATH=/usr/local/bin:$PATH"]) { 
+                    sh '''
+                        echo Deploying to S3...
+                        aws s3 sync dist/kickstart-angular s3://jenkins-angular-bucket/
+                    '''
+                }
+            }
         }
-    }
-}
     }
 }
