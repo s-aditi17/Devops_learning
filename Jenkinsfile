@@ -7,7 +7,7 @@ pipeline {
         AWS_REGION = 'us-east-1'
         SONARQUBE_PROJECT_NAME = 'kickstart-app'
         SONARQUBE_PROJECT_KEY = 'kickstart-app'
-        NODE_OPTIONS = '--max-old-space-size=4096'
+        NODE_OPTIONS = '--max-old-space-size=3800'
     }
     tools {
         nodejs 'NodeJS'  // Ensure this is configured in your Jenkins Global Tool Configuration
