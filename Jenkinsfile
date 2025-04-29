@@ -4,8 +4,7 @@ pipeline {
     environment {
        NODE_HOME = tool name: 'NodeJS', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
        PATH = "${NODE_HOME}/bin:${env.PATH}"
-        
-        
+            
     }
 
     stages {
@@ -21,7 +20,7 @@ pipeline {
             scannerHome = tool 'sonar'
             }
                 withSonarQubeEnv("sonar") {                        
-                       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=kickstart-app -Dsonar.sources=src"
+                       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Devops_learning -Dsonar.sources=src"
                 }
             }
         }
