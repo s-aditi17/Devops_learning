@@ -12,13 +12,13 @@ pipeline {
     }
 
     stages {
-        
         stage('Install Dependencies') {
             steps {
                 sh 'npm install'
             }
         }
-         stage('sonar') {
+
+        stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv("${SONARQUBE_SERVER}") {
                     sh '''
@@ -27,6 +27,7 @@ pipeline {
                           -Dsonar.projectKey=kickstart-app \
                           -Dsonar.sources=src 
                          
+                    '''
                 }
             }
         }
@@ -36,8 +37,5 @@ pipeline {
                 sh 'ng build --configuration production'
             }
         }
-       
-
-   
     }
 }
