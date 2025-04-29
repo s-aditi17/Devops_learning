@@ -11,7 +11,7 @@ pipeline {
 
     }
     tools {
-        nodejs "Node-14.19.0"
+        nodejs "NodeJS"
     }
     stages {
      
