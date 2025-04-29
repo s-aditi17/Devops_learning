@@ -50,5 +50,15 @@ pipeline {
                 sh 'npm run build'
             }
         }
+         stage('Deploy to S3') {
+    steps {
+        withEnv(["PATH=/usr/local/bin:$PATH"]) { 
+            sh '''
+                echo Deploying to S3...
+                aws s3 sync dist/kickstart-angular s3://jenkins-angular-bucket/
+            '''
+        }
+    }
+}
     }
 }
