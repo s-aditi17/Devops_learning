@@ -8,6 +8,7 @@ pipeline {
     environment {
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
+        
     }
 
     stages {
@@ -19,17 +20,14 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv("sonar") {
-                    sh '''
-                        echo "Running SonarQube Scanner..."
-                        sonar-scanner \
-                          -Dsonar.projectKey=kickstart-app \
-                          -Dsonar.sources=src
-                          
-                    '''
+              script {
+                scannerHome = tool 'sonar'
+                }
+                  withSonarQubeEnv("sonar") {                        
+                       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=kickstart-app -Dsonar.sources=src"
+                    }
                 }
             }
-        }
 
         stage('Build Angular App') {
             steps {
