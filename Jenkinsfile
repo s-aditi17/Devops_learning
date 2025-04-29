@@ -1,13 +1,10 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs 'NodeJS 14.19.0'  
-    }
-
     environment {
-        NPM_VERSION = '8.5.2'
-        ANGULAR_CLI_VERSION = '12.2.16'
+       NODE_HOME = tool name: 'NodeJS', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
+       PATH = "${NODE_HOME}/bin:${env.PATH}"
+        
         
     }
 
@@ -20,18 +17,18 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-              script {
-                scannerHome = tool 'sonar'
-                }
-                  withSonarQubeEnv("sonar") {                        
+            script {
+            scannerHome = tool 'sonar'
+            }
+                withSonarQubeEnv("sonar") {                        
                        sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=kickstart-app -Dsonar.sources=src"
-                    }
                 }
             }
+        }
 
         stage('Build Angular App') {
             steps {
-                sh 'npm run build'
+                sh 'npm run build"
             }
         }
     }
