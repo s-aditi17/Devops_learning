@@ -2,52 +2,59 @@ pipeline {
     agent any
 
     tools {
-        nodejs 'NodeJS 14.19.0'  
+        nodejs 'NodeJS 14.19.0'
     }
 
     environment {
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
+        SONARQUBE_SERVER = 'sonar' 
     }
 
     stages {
-        stage('Install npm and Angular CLI') {
+        stage('Setup Tools') {
             steps {
                 sh '''
+                    echo "Installing specific npm and Angular CLI versions..."
                     npm install -g npm@${NPM_VERSION}
                     npm install -g @angular/cli@${ANGULAR_CLI_VERSION}
+                    echo "Installed Versions:"
+                    node -v
+                    npm -v
                     ng version
                 '''
             }
         }
 
-        stage('Clone Repo') {
-            steps {
-                git 'https://github.com/s-aditi17/Devops_learning.git'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                sh '''
+                    echo "Installing project dependencies..."
+                    npm install
+                '''
             }
         }
 
         stage('Build Angular App') {
             steps {
-                sh 'ng build --configuration production'
+                sh '''
+                    echo "Building Angular Application..."
+                    ng build --configuration production
+                '''
             }
         }
 
-        stage('Deploy to S3') {
-    steps {
-        withEnv(["PATH=/usr/local/bin:$PATH"]) { // ADD THIS
-            sh '''
-                echo Deploying to S3...
-                aws s3 sync dist/kickstart-angular s3://jenkins-angular-bucket/
-            '''
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                    sh '''
+                        echo "Running SonarQube Scanner..."
+                        sonar-scanner \
+                          -Dsonar.projectKey=kickstart-app \
+                          -Dsonar.sources=src 
+                    '''
+                }
+            }
         }
-    }
-}
     }
 }
