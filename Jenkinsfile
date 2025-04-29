@@ -31,7 +31,7 @@ pipeline {
 
         stage('Build Angular App') {
             steps {
-                sh 'ng build --configuration production'
+                sh 'npm run build'
             }
         }
     }
