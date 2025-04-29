@@ -8,7 +8,7 @@ pipeline {
     environment {
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
-        SONARQUBE_SERVER = 'sonar'
+        
     }
 
     stages {
@@ -20,7 +20,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                withSonarQubeEnv("sonar") {
                     sh '''
                         echo "Running SonarQube Scanner..."
                         sonar-scanner \
