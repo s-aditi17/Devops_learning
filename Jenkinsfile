@@ -8,7 +8,6 @@ pipeline {
     environment {
         NPM_VERSION = '8.5.2'
         ANGULAR_CLI_VERSION = '12.2.16'
-        
     }
 
     stages {
@@ -25,8 +24,9 @@ pipeline {
                         echo "Running SonarQube Scanner..."
                         sonar-scanner \
                           -Dsonar.projectKey=kickstart-app \
-                          -Dsonar.sources=src 
-                         
+                          -Dsonar.sources=src \
+                          -Dsonar.host.url=$SONAR_HOST_URL \
+                          -Dsonar.login=$SONAR_AUTH_TOKEN
                     '''
                 }
             }
