@@ -1,34 +1,50 @@
+
 pipeline {
     agent any
-
     environment {
-       NODE_HOME = tool name: 'NodeJS', type: 'jenkins.plugins.nodejs.tools.NodeJSInstallation'
-       PATH = "${NODE_HOME}/bin:${env.PATH}"
-            
-    }
+        NODE_VERSION = '14.19.0'
+        NPM_VERSION = '8.5.2'
+        ANGULAR_CLI_VERSION = '12.2.16'
+        AWS_REGION = 'us-east-1'
+        SONARQUBE_PROJECT_NAME = 'kickstar-app'
+        SONARQUBE_PROJECT_KEY='kickstart-app'
 
+    }
+    tools {
+        nodejs "Node-14.19.0"
+    }
     stages {
-        stage('Install Dependencies') {
+     
+        stage ('install dependency') {
             steps {
-                sh 'npm install'
+             script {
+                sh "npm install -g npm@${NPM_VERSION}"
+                sh "npm install -g @angular/cli@${ANGULAR_CLI_VERSION}"
+                sh "npm install"
             }
         }
-
+        }
         stage('SonarQube Analysis') {
             steps {
-            script {
-            scannerHome = tool 'sonar'
-            }
-                withSonarQubeEnv("sonar") {                        
-                       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=kickstart-app -Dsonar.projectName=kickstart-app -Dsonar.sources=src"
+                script {
+                    def scannerHome = tool 'sonar' 
+                    withSonarQubeEnv(credentialsId: 'sonar')  {  
+                    
+                        sh "${scannerHome}/bin/sonar-scanner \
+-Dsonar.projectKey=${SONARQUBE_PROJECT_KEY} \
+-Dsonar.projectName=${SONARQUBE_PROJECT_NAME} \
+                            -Dsonar.sources=src \
+-Dsonar.javascript.lcov.reportPaths=coverage/lcov-report/lcov-report.json"
+                    }
                 }
             }
         }
-
-        stage('Build Angular App') {
+        stage ('build') {
             steps {
                 sh 'npm run build'
             }
         }
+
     }
 }
+
