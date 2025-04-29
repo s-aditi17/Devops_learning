@@ -20,7 +20,7 @@ pipeline {
             scannerHome = tool 'sonar'
             }
                 withSonarQubeEnv("sonar") {                        
-                       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=Devops_learning -Dsonar.sources=src"
+                       sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=kickstart-app -Dsonar.projectName=kickstart-app -Dsonar.sources=src"
                 }
             }
         }
